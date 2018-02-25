@@ -32,8 +32,12 @@ std::vector<int> constraintFind::getConstrBox
 (std::vector<std::vector<int>> board, int x, int y)
 {
 	std::vector<int> rtrConstraint;
+
+	// Find box left upper box coordinates based on param
 	int indexX = (x/3)*3;
 	int indexY = (y/3)*3;
+
+	// Go through box
 	for(auto i = board.begin()+indexY; i < board.begin()+indexY + 3; i++){
 		for(auto j = i->begin()+indexX; j < i->begin()+indexX+3; j++){
 			if(*j != 0){
@@ -44,15 +48,3 @@ std::vector<int> constraintFind::getConstrBox
 	return rtrConstraint;
 
 }
-
-/*std::vector<int> constraintFind::getConstrPredict
-(std::vector<std::vector<int>> board, int x, int y)
-{
-	//std::vector<int> available = getConstrBox()
-}
-
-std::vector<int> constraintFind::getConstrAll
-(std::vector<std::vector<int>> board, int x, int y)
-{
-
-}*/

@@ -21,13 +21,15 @@ public:
 	// reset board
 	// unit test
 
-	// solves current broad
-	void solveBoard();
+	/* solves current broad
+	@return: true if it can solve, false otherwise
+	*/
+	bool solveBoard();
 
 	/*
 	@param: coords for box to look in
 	@return: an array where 0 = value | 1 = x | 2 = y.
-			{-1, -1, -1} if invalid 
+			{-1, -1, -1} if invalid
 	*/
 	std::array<int, 3> getBestStep(int x, int y);
 };

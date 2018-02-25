@@ -104,11 +104,12 @@ void Board::printBoard(){
 	}
 }
 
-void Board::solveBoard(){
+bool Board::solveBoard(){
 	bool solved = false;
+
 	printBoard();
 	while (!solved){
-
+		std::vector<std::vector<int>> prevBoard = board;;
 		// look each box
 		int yPos = 0;
 		while(yPos <= 6){
@@ -132,9 +133,10 @@ void Board::solveBoard(){
 				solved = false;
 			}
 		}
-
+		if(prevBoard == board) return false;
 	}
 	printBoard();
+	return true;
 }
 
 std::array<int, 3> Board::getBestStep(int x, int y){
@@ -171,17 +173,22 @@ std::array<int, 3> Board::getBestStep(int x, int y){
 	for(auto i = board.begin()+indexY; i < board.begin()+indexY + 3; i++){
 		int xCount = indexX;
 
+		// loop inside box dimension
 		for(auto j = i->begin()+indexX; j < i->begin()+indexX + 3; j++){
+			// if tile is empty
 			if(*j == 0){
-				auto horiz = finder.getConstrHorizontal(this->board, xCount, yCount);
-				auto vert = finder.getConstrVertical(this->board, xCount, yCount);
+				auto horiz = finder.getConstrHorizontal(board, xCount, yCount);
+				auto vert = finder.getConstrVertical(board, xCount, yCount);
+
 				for(auto& k : availableSteps){
+					// if value is taken
 					if(std::find(horiz.begin(), horiz.end(), k) != horiz.end()){
 
 					}
 					else if(std::find(vert.begin(), vert.end(), k) != vert.end()){
 
 					}
+					// if value is not taken
 					else{
 						score[k-1]++;
 						if(score[k-1] == 1){
@@ -198,10 +205,12 @@ std::array<int, 3> Board::getBestStep(int x, int y){
 		}
 		yCount++;
 	}
+	// return array with least score
 	for(int i = 0; i < 9; i++){
 		if(score[i] == 1){
 			return rtrArray[i];
 		}
 	}
+	// return invalid array
 	return rtrArray[9];
 }
