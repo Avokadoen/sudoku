@@ -1,7 +1,7 @@
 #include "board.hpp"
 #include <iostream>
 #include <algorithm>
-
+#include <ctime>
 /*
 
 Starting Sudoku:
@@ -35,9 +35,12 @@ Solution:
 
 */
 
-
 Board::Board(){
+	srand(time(nullptr));
+}
 
+std::vector<std::vector<int>> Board::makeExampleBoard(){
+	std::vector<std::vector<int>> board;
 	board.resize(9);
 	for(auto& i : board){
 		i.resize(9);
@@ -79,11 +82,11 @@ Board::Board(){
 	board[8][1] = 3;
 	board[8][4] = 5;
 	board[8][5] = 6;
-
+	return board;
 	//printBoard();
 }
 
-void Board::printBoard(){
+void Board::printBoard(std::vector<std::vector<int>>& board){
 	std::cout << std::endl;
 	int countX;
 	int countY = 1;
@@ -104,10 +107,10 @@ void Board::printBoard(){
 	}
 }
 
-bool Board::solveBoard(){
+bool Board::solveBoard(std::vector<std::vector<int>> board){
 	bool solved = false;
 
-	printBoard();
+	printBoard(board);
 	while (!solved){
 		std::vector<std::vector<int>> prevBoard = board;;
 		// look each box
@@ -116,7 +119,7 @@ bool Board::solveBoard(){
 			int xPos = 0;
 			while(xPos <= 6){
 
-				std::array<int,3> bestStep = getBestStep(xPos, yPos);
+				std::array<int,3> bestStep = getBestStep(board, xPos, yPos);
 				// if we found an answer, save to board
 				if(bestStep[0] > 0){
 					board[bestStep[2]][bestStep[1]] = bestStep[0];
@@ -135,11 +138,11 @@ bool Board::solveBoard(){
 		}
 		if(prevBoard == board) return false;
 	}
-	printBoard();
+	printBoard(board);
 	return true;
 }
 
-std::array<int, 3> Board::getBestStep(int x, int y){
+std::array<int, 3> Board::getBestStep(std::vector<std::vector<int>>& board, int x, int y){
 
 	std::vector<int> availableSteps;
 	std::array<int, 9> score;
@@ -213,4 +216,68 @@ std::array<int, 3> Board::getBestStep(int x, int y){
 	}
 	// return invalid array
 	return rtrArray[9];
+}
+
+std::vector<std::vector<int>> Board::generateBoard(){
+	std::vector<std::vector<int>> contendingBoard = createRandomBoard();
+	while(!solveBoard(contendingBoard)){
+		contendingBoard = createRandomBoard();
+	}
+	printBoard(contendingBoard);
+}
+
+std::vector<std::vector<int>> Board::createRandomBoard(){
+
+	std::vector<int> valuesToPlace;
+	int values = rand()%35 + 1;
+	valuesToPlace.resize(35);
+	for(int i = 0; i < values; i++){
+		valuesToPlace.push_back(rand()%9 + 1);
+	}
+
+	std::vector<std::vector<int>> board;
+	board.resize(9);
+	for(auto& i : board){
+		i.resize(9);
+		std::fill(i.begin(), i.end(), 0);
+	}
+	int count = 0;
+	while(!valuesToPlace.empty()){
+
+		std::cout << "\n\neg lev!\n\n";
+		bool placed = false;
+		int attempts = 0;
+		while(!placed && !valuesToPlace.empty()){
+			std::cout << count++ << std::endl;
+			attempts++;
+			int indexX = rand()%9;
+			int indexY = rand()%9;
+			if(board[indexY][indexX] == 0){
+				auto horiz = finder.getConstrHorizontal(board, indexX, indexY);
+				auto vert = finder.getConstrVertical(board, indexX, indexY);
+				auto box = finder.getConstrBox(board, indexX, indexY);
+				if(attempts++ > 40){
+					valuesToPlace.erase(std::remove(valuesToPlace.begin(), valuesToPlace.end(), valuesToPlace.back()), valuesToPlace.end());
+					placed = true;
+				}
+				else if(std::find(horiz.begin(), horiz.end(), valuesToPlace.back()) != horiz.end()){
+				}
+				else if(std::find(vert.begin(), vert.end(), valuesToPlace.back()) != vert.end()){
+				}
+				else if(std::find(box.begin(), box.end(), valuesToPlace.back()) != vert.end()){
+				}
+				// if value is not taken
+				else{
+					std::cout << indexX << " " << indexY << std::endl;
+					board[indexY][indexX] = valuesToPlace.back();
+					//valuesToPlace.pop_back();
+					valuesToPlace.erase(std::remove(valuesToPlace.begin(), valuesToPlace.end(), valuesToPlace.back()), valuesToPlace.end());
+
+					placed = true;
+				}
+			}
+			valuesToPlace.shrink_to_fit();
+		}
+	}
+
 }
